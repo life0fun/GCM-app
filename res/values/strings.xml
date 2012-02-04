@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, TeloActivity!</string>
+    <string name="app_name">Telo</string>
+	<string name="input">In</string>
+	<string name="output">Out</string>
+	<string name="no_device">Please connect a FreeduinoControl board.</string>
+	<string name="panServoLabel">pan_Servo</string>
+	<string name="tiltServoLabel">tilt_Servo</string>
+	<string name="ledLabel">Serial_activity_LED</string>
+	<string name="off">Off</string>
+	<string name="on">On</string>
+
+</resources>

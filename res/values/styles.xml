@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="FreeduinoControlTextBase" parent="@android:style/TextAppearance.Medium">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:typeface">sans</item>
+		<item name="android:textSize">24dip</item>
+		<item name="android:textColor">@color/FreeduinoControlTextWhite</item>
+		<item name="android:background">@null</item>
+		<item name="android:includeFontPadding">false</item>
+	</style>
+	<style name="FreeduinoControlControlLabel" parent="@style/FreeduinoControlTextBase">
+		<item name="android:textSize">15dip</item>
+		<item name="android:textColor">@color/FreeduinoControlLabelGray</item>
+		<item name="android:includeFontPadding">true</item>
+		<item name="android:layout_height">25dip</item>
+		<item name="android:lineSpacingExtra">2dip</item>
+	</style>
+
+	<style name="FreeduinoControlMotorText" parent="@style/FreeduinoControlControlLabel">
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+	</style>
+	<style name="FreeduinoControlNoDevice" parent="@style/FreeduinoControlTextBase">
+		<item name="android:textSize">30dip</item>
+	</style>
+
+
+</resources>
