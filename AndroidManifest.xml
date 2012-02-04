@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.abarry.telo"
+    android:versionCode="1"
+    android:versionName="1.0" >
+    
+    <uses-feature android:name="android.hardware.usb.accessory" />
+
+    <!--  requires android 2.2 or above for C2DM API BUT 3.something
+    		for USB-->
+    <uses-sdk android:minSdkVersion="12" />
+    
+
+    <!--  permission for C2DM API -->
+    <permission
+        android:name="org.abarry.telo.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="org.abarry.telo.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--  note: we had to change "icon" to "ic_launcher" to get the icon resources
+        	to line up (differing from the tutorial) -->
+        	
+    <!--  permission for knowing when boot is finished so we can start our registration service -->  
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    
+    <!--  main application -->
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        
+        <uses-library android:name="com.android.future.usb.accessory" />
+        
+        <!--  main window -->
+        <activity
+            android:label="@string/app_name"
+            android:name="org.abarry.telo.TeloActivity" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--  callback for C2DM registration successful (gets the registration ID) -->
+        <receiver
+            android:name=".C2DMRegistrationReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter >
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" >
+                </action>
+
+                <category android:name="org.abarry.telo" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".C2DMMessageReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter >
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" >
+                </action>
+
+                <category android:name="org.abarry.telo" />
+            </intent-filter>
+        </receiver>
+        
+        <!--  callback for RETRY on the C2DM registration -->
+        <receiver android:name=".C2DMRegistrationReceiver">
+	        <intent-filter>
+	         <action android:name="com.google.android.c2dm.intent.RETRY"/>
+	         <category android:name="org.abarry.telo" />
+	    </intent-filter>
+	    </receiver>
+        
+
+        <!--  callback for boot completed, note that you need the permission here as well
+        to know when boot is finished -->
+        <receiver
+            android:enabled="true"
+            android:name=".TeloStartupIntentReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+			<intent-filter>
+				<action
+				android:name="android.intent.action.BOOT_COMPLETED" />
+				<category android:name="android.intent.category.HOME" />
+			</intent-filter>
+		</receiver>
+        
+        <!--  activities -->
+        <activity android:name="RegistrationResultActivity" >
+        </activity>
+        <activity android:name="MessageReceivedActivity" >
+        </activity>
+        
+        <!--  startup service that does the registration -->
+        <service android:name=".TeloStartupService">
+		<intent-filter>
+			<action
+			android:name="org.abarry.telo.TeloStartupService" />
+		</intent-filter>
+		</service>
+	
+        <service android:name=".UsbFromC2DMService">
+			<intent-filter>
+				<action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
+			</intent-filter>
+
+			<meta-data android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+				android:resource="@xml/accessory_filter" />
+		</service>
+        
+    </application>
+    
+    
+</manifest>
