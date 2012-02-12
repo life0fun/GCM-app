@@ -1,3 +1,11 @@
+/* Receives messages from the cloud via push notifications
+ * (Google's C2DM)
+ * 
+ * When it gets the message, it fires an intent that contains the message
+ * payload.  The intent calls UsbFromC2DMService's onStartCommand() function
+ * which then interprets the payload and sends a USB command to the robot
+ */
+
 package org.abarry.telo;
 
 
@@ -20,16 +28,14 @@ public class C2DMMessageReceiver extends BroadcastReceiver {
 			Log.w("C2DM", "Received message");
 			final String payload = intent.getStringExtra("payload");
 			Log.d("C2DM", "dmControl: payload = " + payload);
-			// TODO Send this to my application server to get the real data
-			// Lets make something visible to show that we received the message
-			createNotification(context, payload);
 			
-			
+			// call our function which will fire off the USB intent
 			doUsb(context, payload);
 
 		}
 	}
 	
+	// helper function that creates an intent for UsbFromC2DmService	
 	private void doUsb(Context context, String payload)
 	{
 		Log.d("C2DM", "in doUsb");
@@ -39,23 +45,6 @@ public class C2DMMessageReceiver extends BroadcastReceiver {
 		i.putExtra("payload", payload);
 		context.startService(i);
 		
-	}
-
-	public void createNotification(Context context, String payload) {
-		NotificationManager notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(R.drawable.ic_launcher,
-				"Message received", System.currentTimeMillis());
-		// Hide the notification after its selected
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-		Intent intent = new Intent(context, MessageReceivedActivity.class);
-		intent.putExtra("payload", payload);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-				intent, 0);
-		notification.setLatestEventInfo(context, "Message",
-				"New message received: " + payload, pendingIntent);
-		notificationManager.notify(0, notification);
 	}
 
 }
