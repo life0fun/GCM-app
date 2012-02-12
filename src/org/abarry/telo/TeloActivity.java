@@ -16,7 +16,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 /**
- * Activity for the telo robot.
+ * Activity for the telo robot. Displays the GUI and allows you
+ * to name the robot, see your registration key, and force a registration
  *
  */
 public class TeloActivity extends Activity {
@@ -62,13 +63,14 @@ public class TeloActivity extends Activity {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		String string = prefs.getString(AUTH, "n/a");
-		Toast.makeText(this, string, Toast.LENGTH_LONG).show();
+		Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
 		Log.d("C2DM RegId", string);
 
 	}
 	
 	/**
 	 * Saves the phone name in a shared preference
+	 * (called when "Save Name" button is pressed)
 	 * @param view
 	 */
 	public void saveName(View view) {
@@ -78,14 +80,19 @@ public class TeloActivity extends Activity {
 		Editor edit = prefs.edit();
 		String thisName = textbox.getText().toString();
 		
+		// check to make sure that the name 
 		if (thisName.length() > 0)
 		{
+			// put the phone's name into the shared preferences so we'll remember it
+			// in other places and between runs
 			edit.putString("phoneName", thisName);
 			edit.commit();
 			
-			Toast.makeText(this, "Saved", Toast.LENGTH_LONG).show();
+			// display a notification that we saved it
+			Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, "Enter a name", Toast.LENGTH_LONG).show();
+			// display a notification that the user must enter a name
+			Toast.makeText(this, "Enter a name", Toast.LENGTH_SHORT).show();
 		}
 	}
 }

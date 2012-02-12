@@ -199,16 +199,16 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		// check for the "Forward" button being pressed
 		if (payload.equals("f"))
 		{
+			// sending a -1 will make the LED bright on pin 3
 			sendCommand((byte) 2, (byte) 0, (byte) -1);
-			// throw a toast saying that we're firing a USB event
-
-			toast = Toast.makeText(this, "FULL SPEED", duration);
-			toast.show();
+			
 		} else {
+			
+			// sending a 78 will dim the LED on pin 3
 			sendCommand((byte) 2, (byte) 0, (byte) 78);
 		}
 		
-		// ------------- TODO: call sendCommand here ----------- //
+		// ------------- TODO: more sendCommand calls here ----------- //
 	}
 
 
@@ -217,6 +217,13 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		super.onDestroy();
 	}
 
+	/**
+	 * Open the USB accessory
+	 * Note that this calls the Runnable here to fire off
+	 * the thread that actually opens the device
+	 * 
+	 * @param accessory the device to open
+	 */
 	private void openAccessory(UsbAccessory accessory) {
 		mFileDescriptor = mUsbManager.openAccessory(accessory);
 		if (mFileDescriptor != null) {
@@ -245,16 +252,16 @@ public class UsbFromC2DMService extends Service implements Runnable {
 			mFileDescriptor = null;
 			mAccessory = null;
 		}
+		
+		// kill ourselves (stop this service) so that next time we
+		// get a new USB device we start the service from scratch
 		stopSelf();
 	}
 
-	private int composeInt(byte hi, byte lo) {
-		int val = (int) hi & 0xff;
-		val *= 256;
-		val += (int) lo & 0xff;
-		return val;
-	}
-
+	/**
+	 * Thread that actually registeres the USB device.  Taken directly from the
+	 * Google sample code
+	 */
 	public void run() {
 		int ret = 0;
 		byte[] buffer = new byte[16384];
@@ -307,7 +314,11 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		}
 	};
 
-	public void Toast(CharSequence toastStr)
+	/** Helper function for toasts
+	 * 
+	 * @param toastStr string to toast
+	 */
+	private void Toast(CharSequence toastStr)
 	{
 		int duration = Toast.LENGTH_SHORT;
 
@@ -315,6 +326,13 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		toast.show();
 	}
 	
+	/**
+	 * Sends commands to the USB port.
+	 * 
+	 * @param command
+	 * @param target
+	 * @param value
+	 */
 	public void sendCommand(byte command, byte target, int value) {
 		
 		CharSequence text = "USB Command: " + command + " target: " + target + " value: " + value;
