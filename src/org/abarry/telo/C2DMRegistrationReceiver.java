@@ -1,8 +1,6 @@
 package org.abarry.telo;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +29,12 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 
 /**
- * Receives the broadcast when the C2DM fires the callback.  Gets the information in the callback
- * and remembers the key, but more importantly sends the key to the server which will write it down
+ * To use C2DM you must register your device against Google's servers.  This is the class that
+ * deals with the callback for that registratoin (ie when it works, for example).
+ * Gets the information in the callback such as the device key (which a server needs when sending
+ * a notification.
+ * 
+ * Then sends the key to our server which will write it down
  * in the MySQL database.
  *
  */
