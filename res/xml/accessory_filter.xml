@@ -14,5 +14,6 @@
      limitations under the License.
 -->
 <resources>
+	<usb-accessory manufacturer="Google, Inc." model="DemoKit" version="1.0" />
     <usb-accessory manufacturer="9th Sense, Inc." model="FreeduinoControl" version="1.0" />
 </resources>

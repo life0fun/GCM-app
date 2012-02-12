@@ -11,8 +11,8 @@ public class OutputController extends AccessoryController {
 
 	private boolean mVertical;
 
-	OutputController(FreeduinoControlActivity hostActivity, boolean vertical) {
-		super(hostActivity);
+	OutputController(boolean vertical) {
+		super();
 		mVertical = vertical;
 	}
 
@@ -23,12 +23,12 @@ public class OutputController extends AccessoryController {
 	}
 
 	private void setupServoController(int servoIndex, int viewId) {
-		ServoController sc = new ServoController(mHostActivity, servoIndex);
+		//ServoController sc = new ServoController(mHostActivity, servoIndex);
 		//sc.attachToView((ViewGroup) findViewById(viewId));
 	}
 
 	private void setupMotorController(int index, int viewId) {
-		MotorController Motor = new MotorController(mHostActivity, index);
+		//MotorController Motor = new MotorController(mHostActivity, index);
 		//Motor.attachToView((ViewGroup) findViewById(viewId));
 	}
 }

@@ -30,6 +30,8 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 	private static final String ACTION_USB_PERMISSION = "org.abarry.telo.action.USB_PERMISSION";
 
+	private OutputController mOutputController;
+	
 	private UsbManager mUsbManager;
 	private PendingIntent mPermissionIntent;
 	private boolean mPermissionRequestPending;
@@ -64,6 +66,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			Toast("received broadcast");
 			String action = intent.getAction();
 			if (ACTION_USB_PERMISSION.equals(action)) {
 				synchronized (this) {
@@ -75,6 +78,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 					} else {
 						Log.d(TAG, "permission denied for accessory "
 								+ accessory);
+						Toast("permission denied for accessory");
 					}
 					mPermissionRequestPending = false;
 				}
@@ -99,6 +103,12 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 		filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
 		registerReceiver(mUsbReceiver, filter);
+		
+		mOutputController = new OutputController(true);
+		mOutputController.accessoryAttached();
+		
+		
+		onCreate2();
 
 	}
 	
@@ -108,20 +118,29 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		// fire off a sendCommand based on the data in intent
 		
 		Log.d(TAG, "in onStartCommand");
+		Toast("in onStartCommand");
 		
 		// get the payload string
 		Bundle extras = intent.getExtras();
 		String payload = extras.getString("payload", "");
 		
 		// throw a toast saying that we're firing a USB event
-		CharSequence text = "USB Command: " + payload;
+		CharSequence text = "USB Command: \"" + payload + "\" payload length: " + payload.length();
 		int duration = Toast.LENGTH_SHORT;
 
 		Toast toast = Toast.makeText(this, text, duration);
 		toast.show();
 		
-		
-		
+		if (payload.equals("f"))
+		{
+			sendCommand((byte) 2, (byte) 0, (byte) -1);
+			// throw a toast saying that we're firing a USB event
+
+			toast = Toast.makeText(this, "FULL SPEED", duration);
+			toast.show();
+		} else {
+			sendCommand((byte) 2, (byte) 0, (byte) 78);
+		}
 		
 		// ------------- TODO: call sendCommand here ----------- //
 		
@@ -129,10 +148,11 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		
 	}
 
-/*
-	public void onResume() {
 
-		Intent intent = getIntent();
+//	public void onResume() {
+	public void onCreate2() {
+
+		//Intent intent = getIntent();
 		if (mInputStream != null && mOutputStream != null) {
 			return;
 		}
@@ -154,7 +174,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		} else {
 			Log.d(TAG, "mAccessory is null");
 		}
-	} */
+	}
 
 	public void onDestroy() {
 		unregisterReceiver(mUsbReceiver);
@@ -171,8 +191,10 @@ public class UsbFromC2DMService extends Service implements Runnable {
 			Thread thread = new Thread(null, this, "DemoKit");
 			thread.start();
 			Log.d(TAG, "accessory opened");
+			Toast("accessory opened");
 		} else {
 			Log.d(TAG, "accessory open fail");
+			Toast("accessory open fail");
 		}
 	}
 
@@ -187,6 +209,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 			mFileDescriptor = null;
 			mAccessory = null;
 		}
+		stopSelf();
 	}
 
 	private int composeInt(byte hi, byte lo) {
@@ -226,6 +249,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 				default:
 					Log.d(TAG, "unknown msg: " + buffer[i]);
+					Toast("unknown msg: " + buffer[i]);
 					i = len;
 					break;
 				}
@@ -247,7 +271,22 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		}
 	};
 
+	public void Toast(CharSequence toastStr)
+	{
+		int duration = Toast.LENGTH_SHORT;
+
+		Toast toast = Toast.makeText(this, toastStr, duration);
+		toast.show();
+	}
+	
 	public void sendCommand(byte command, byte target, int value) {
+		
+		CharSequence text = "USB Command: " + command + " target: " + target + " value: " + value;
+		int duration = Toast.LENGTH_SHORT;
+
+		Toast toast = Toast.makeText(this, text, duration);
+		toast.show();
+		
 		byte[] buffer = new byte[3];
 		if (value > 255)
 			value = 255;

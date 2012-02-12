@@ -13,7 +13,7 @@ public class FreeduinoControlTablet extends BaseActivity {
 
 	protected void showControls() {
 		super.showControls();
-		mOutputController = new OutputController(this, true);
+		mOutputController = new OutputController(true);
 		mOutputController.accessoryAttached();
 	}
 }
