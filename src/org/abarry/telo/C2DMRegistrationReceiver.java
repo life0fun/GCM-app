@@ -27,6 +27,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * To use C2DM you must register your device against Google's servers.  This is the class that
@@ -94,7 +95,7 @@ public class C2DMRegistrationReceiver extends BroadcastReceiver {
 			
 			// create a notification that we got the ID
 			// this is safe to comment out.
-			createNotification(context, registrationId);
+			Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show();
 			
 			// get the phone name
 			SharedPreferences prefs = context.getSharedPreferences("org.abarry.telo",
@@ -121,7 +122,7 @@ public class C2DMRegistrationReceiver extends BroadcastReceiver {
 	/**
 	 * Checks the internal preferences to see if there is an ID.  If not,
 	 * attempts a retry.  Currently unused since Android seems to do a pretty
-	 * good job of cacheing attempts to register when the internet connection
+	 * good job of caching attempts to register when the internet connection
 	 * is down.
 	 */
 	/*
@@ -158,28 +159,6 @@ public class C2DMRegistrationReceiver extends BroadcastReceiver {
 		edit.commit();
 	}
 
-	/**
-	 * create a notification that we received the registration ID
-	 * it is safe to never call this
-	 * @param context
-	 * @param registrationId
-	 */
-	public void createNotification(Context context, String registrationId) {
-		NotificationManager notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(R.drawable.ic_launcher,
-				"Registration successful", System.currentTimeMillis());
-		// Hide the notification after its selected
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-		Intent intent = new Intent(context, RegistrationResultActivity.class);
-		intent.putExtra("registration_id", registrationId);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-				intent, 0);
-		notification.setLatestEventInfo(context, "Registration",
-				"Successfully registered", pendingIntent);
-		notificationManager.notify(0, notification);
-	}
 
 	/**
 	 * Sends the registration ID to the server, with the URL defined in

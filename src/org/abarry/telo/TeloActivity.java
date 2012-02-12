@@ -46,16 +46,7 @@ public class TeloActivity extends Activity {
 	 *  @param view
 	 */
 	public void register(View view) {
-		/*Log.w("C2DM", "start registration process");
-		Intent intent = new Intent("com.google.android.c2dm.intent.REGISTER");
-		intent.putExtra("app",
-				PendingIntent.getBroadcast(this, 0, new Intent(), 0));
-
-		// this must be the registered gmail account, the comment in the tutorial is wrong
-		intent.putExtra("sender", "telebotphone@gmail.com");
-		startService(intent);
-		*/
-		
+		// fire an intent to start the registration service
 		Intent serviceIntent = new Intent();
 		serviceIntent.setAction("org.abarry.telo.TeloStartupService");
 		startService(serviceIntent);

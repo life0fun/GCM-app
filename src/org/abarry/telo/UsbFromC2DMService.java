@@ -21,6 +21,16 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Class that manages the USB device, including registering, closing, and
+ * communication.
+ * 
+ * Is a service so you can have other applications running in the foreground but
+ * still manage USB commands in the background.
+ * 
+ * @author abarry
+ *
+ */
 public class UsbFromC2DMService extends Service implements Runnable {
 	private static final String TAG = "UsbFromC2DMService";
 
@@ -36,9 +46,11 @@ public class UsbFromC2DMService extends Service implements Runnable {
 	FileInputStream mInputStream;
 	FileOutputStream mOutputStream;
 
+	// Freediuno dependent constants
 	public static final byte MOTOR_SERVO_COMMAND = 2;
 	private static final int MESSAGE_SWITCH = 1;
 
+	
 	protected class SwitchMsg {
 		private byte sw;
 		private byte state;
@@ -57,7 +69,13 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		}
 	}
 
-
+	/** receives notifications about when a device is disconnected
+	 * this is important so we can close the device and kill ourselves
+	 * so that next time a USB device shows up we'll start from scratch 
+	 * and register the device
+	 * 
+	 * Also has code for opening a device, but that does not seem to run (?)
+	 */
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -93,19 +111,52 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 		//mUsbManager = UsbManager.getInstance(this);
 		mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+		
+		// register ourselves to get info when the USB device is disconnected
 		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
 				ACTION_USB_PERMISSION), 0);
 		IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 		filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
 		registerReceiver(mUsbReceiver, filter);
+
+		// check for a existing input and output streams
+		if (mInputStream != null && mOutputStream != null) {
+			return;
+		}
 		
-		
-		
-		onCreate2();
+		// load the list of USB devices
+		UsbAccessory[] accessories = mUsbManager.getAccessoryList();
+		UsbAccessory accessory = (accessories == null ? null : accessories[0]);
+		if (accessory != null) {
+			
+			// check to see if we can open the device
+			if (mUsbManager.hasPermission(accessory)) {
+				// open the USB device
+				openAccessory(accessory);
+			} else {
+				// ask for permission to open the device
+				synchronized (mUsbReceiver) {
+					if (!mPermissionRequestPending) {
+						mUsbManager.requestPermission(accessory,
+								mPermissionIntent);
+						mPermissionRequestPending = true;
+					}
+				}
+			}
+		} else {
+			Log.d(TAG, "mAccessory is null");
+		}
 
 	}
 	
 	
+	/**
+	 * Run whenever there is a C2DM push notification and also
+	 * on the startup of the service.
+	 * 
+	 * Calls the code that parses the payload and sends a command
+	 * to the USB device
+	 */
 	public int onStartCommand (Intent intent, int flags, int startId)
 	{
 		// fire off a sendCommand based on the data in intent
@@ -116,7 +167,28 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		// get the payload string
 		Bundle extras = intent.getExtras();
 		String payload = extras.getString("payload", "");
+		boolean startup = extras.getBoolean("startup", false);
 		
+		// check to see if this isn't a USB call but is a
+		// "we just started call"
+		if (startup != true)
+		{
+			// call the USB parsing/command function
+			doUsb(payload);
+		}
+		
+		return 0;
+		
+	}
+	
+	/**
+	 * Function that parses the push notification command and sends a USB event.
+	 * If you are changing this code, this is likely the function you're interested
+	 * in changing.
+	 * 
+	 * @param payload
+	 */
+	private void doUsb(String payload) {
 		// throw a toast saying that we're firing a USB event
 		CharSequence text = "USB Command: \"" + payload + "\" payload length: " + payload.length();
 		int duration = Toast.LENGTH_SHORT;
@@ -124,6 +196,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		Toast toast = Toast.makeText(this, text, duration);
 		toast.show();
 		
+		// check for the "Forward" button being pressed
 		if (payload.equals("f"))
 		{
 			sendCommand((byte) 2, (byte) 0, (byte) -1);
@@ -136,38 +209,8 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		}
 		
 		// ------------- TODO: call sendCommand here ----------- //
-		
-		return 0;
-		
 	}
 
-
-//	public void onResume() {
-	public void onCreate2() {
-
-		//Intent intent = getIntent();
-		if (mInputStream != null && mOutputStream != null) {
-			return;
-		}
-
-		UsbAccessory[] accessories = mUsbManager.getAccessoryList();
-		UsbAccessory accessory = (accessories == null ? null : accessories[0]);
-		if (accessory != null) {
-			if (mUsbManager.hasPermission(accessory)) {
-				openAccessory(accessory);
-			} else {
-				synchronized (mUsbReceiver) {
-					if (!mPermissionRequestPending) {
-						mUsbManager.requestPermission(accessory,
-								mPermissionIntent);
-						mPermissionRequestPending = true;
-					}
-				}
-			}
-		} else {
-			Log.d(TAG, "mAccessory is null");
-		}
-	}
 
 	public void onDestroy() {
 		unregisterReceiver(mUsbReceiver);

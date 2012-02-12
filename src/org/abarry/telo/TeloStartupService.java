@@ -31,7 +31,7 @@ public class TeloStartupService extends Service {
 	public void onCreate() {
 		super.onCreate();
 
-		Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service Created", Toast.LENGTH_SHORT).show();
 
 	}
 
@@ -39,7 +39,7 @@ public class TeloStartupService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 
-		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_SHORT).show();
 
 	}
 
@@ -48,7 +48,7 @@ public class TeloStartupService extends Service {
 
 		super.onStart(intent, startId);
 
-		Toast.makeText(this, "Service started, attempting registration...", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service started, attempting registration...", Toast.LENGTH_SHORT).show();
 		
 		// attempt a registration
 		Log.w("C2DM", "start registration process");

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-/* This Activity does nothing but receive USB_DEVICE_ATTACHED events from the
+/** This Activity does nothing but receive USB_DEVICE_ATTACHED events from the
  * USB service and springboards to the main activity and the USB service
  */
 public final class UsbAccessoryActivity extends Activity {
@@ -17,10 +17,13 @@ public final class UsbAccessoryActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		// startup the service that will manage the USB device
 		Intent i = new Intent(this, UsbFromC2DMService.class);
 		i.putExtra("payload", "startup");
+		i.putExtra("startup", true);
 		startService(i);
 		
+		// startup the GUI for Telo
 		Intent intent = new Intent(this, TeloActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_CLEAR_TOP);
