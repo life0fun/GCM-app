@@ -30,7 +30,6 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 	private static final String ACTION_USB_PERMISSION = "org.abarry.telo.action.USB_PERMISSION";
 
-	private OutputController mOutputController;
 	
 	private UsbManager mUsbManager;
 	private PendingIntent mPermissionIntent;
@@ -104,8 +103,6 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
 		registerReceiver(mUsbReceiver, filter);
 		
-		mOutputController = new OutputController(true);
-		mOutputController.accessoryAttached();
 		
 		
 		onCreate2();
