@@ -24,10 +24,10 @@ import android.widget.Toast;
 /**
  * Class that manages the USB device, including registering, closing, and
  * communication.
- * 
+ *
  * Is a service so you can have other applications running in the foreground but
  * still manage USB commands in the background.
- * 
+ *
  * @author abarry
  *
  */
@@ -36,7 +36,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 	private static final String ACTION_USB_PERMISSION = "org.abarry.telo.action.USB_PERMISSION";
 
-	
+
 	private UsbManager mUsbManager;
 	private PendingIntent mPermissionIntent;
 	private boolean mPermissionRequestPending;
@@ -50,7 +50,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 	public static final byte MOTOR_SERVO_COMMAND = 2;
 	private static final int MESSAGE_SWITCH = 1;
 
-	
+
 	protected class SwitchMsg {
 		private byte sw;
 		private byte state;
@@ -71,9 +71,9 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 	/** receives notifications about when a device is disconnected
 	 * this is important so we can close the device and kill ourselves
-	 * so that next time a USB device shows up we'll start from scratch 
+	 * so that next time a USB device shows up we'll start from scratch
 	 * and register the device
-	 * 
+	 *
 	 * Also has code for opening a device, but that does not seem to run (?)
 	 */
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
@@ -111,7 +111,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 		//mUsbManager = UsbManager.getInstance(this);
 		mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-		
+
 		// register ourselves to get info when the USB device is disconnected
 		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
 				ACTION_USB_PERMISSION), 0);
@@ -123,12 +123,12 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		if (mInputStream != null && mOutputStream != null) {
 			return;
 		}
-		
+
 		// load the list of USB devices
 		UsbAccessory[] accessories = mUsbManager.getAccessoryList();
 		UsbAccessory accessory = (accessories == null ? null : accessories[0]);
 		if (accessory != null) {
-			
+
 			// check to see if we can open the device
 			if (mUsbManager.hasPermission(accessory)) {
 				// open the USB device
@@ -148,27 +148,27 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		}
 
 	}
-	
-	
+
+
 	/**
 	 * Run whenever there is a C2DM push notification and also
 	 * on the startup of the service.
-	 * 
+	 *
 	 * Calls the code that parses the payload and sends a command
 	 * to the USB device
 	 */
 	public int onStartCommand (Intent intent, int flags, int startId)
 	{
 		// fire off a sendCommand based on the data in intent
-		
+
 		Log.d(TAG, "in onStartCommand");
 		Toast("in onStartCommand");
-		
+
 		// get the payload string
 		Bundle extras = intent.getExtras();
 		String payload = extras.getString("payload", "");
 		boolean startup = extras.getBoolean("startup", false);
-		
+
 		// check to see if this isn't a USB call but is a
 		// "we just started call"
 		if (startup != true)
@@ -176,16 +176,16 @@ public class UsbFromC2DMService extends Service implements Runnable {
 			// call the USB parsing/command function
 			doUsb(payload);
 		}
-		
+
 		return 0;
-		
+
 	}
-	
+
 	/**
 	 * Function that parses the push notification command and sends a USB event.
 	 * If you are changing this code, this is likely the function you're interested
 	 * in changing.
-	 * 
+	 *
 	 * @param payload
 	 */
 	private void doUsb(String payload) {
@@ -195,20 +195,41 @@ public class UsbFromC2DMService extends Service implements Runnable {
 
 		Toast toast = Toast.makeText(this, text, duration);
 		toast.show();
-		
-		// check for the "Forward" button being pressed
+
+		/*// check for the "Forward" button being pressed
 		if (payload.equals("f"))
 		{
 			// sending a -1 will make the LED bright on pin 3
 			sendCommand((byte) 2, (byte) 0, (byte) -1);
-			
+
 		} else {
-			
+
 			// sending a 78 will dim the LED on pin 3
 			sendCommand((byte) 2, (byte) 0, (byte) 78);
 		}
-		
+
 		// ------------- TODO: more sendCommand calls here ----------- //
+
+		 */
+
+		//if (payload.equals("f"))
+		//{
+			//byte value = 'f';
+		int Value = 0;
+		byte ValueSent = 0;
+		if (payload.length() > 1)
+		{
+			Value = Integer.getInteger(payload.substring(1)); // take the numeric part
+			ValueSent = 1;
+		}
+
+		if (Value < 0) Value = 0;
+		else if (Value > 255) Value = 255;
+
+			sendCommand((byte) payload.charAt(0), ValueSent, (byte) Value);
+		//}
+		//else sendCommand((byte) 3, (byte) 1, (byte) 0);
+
 	}
 
 
@@ -221,7 +242,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 	 * Open the USB accessory
 	 * Note that this calls the Runnable here to fire off
 	 * the thread that actually opens the device
-	 * 
+	 *
 	 * @param accessory the device to open
 	 */
 	private void openAccessory(UsbAccessory accessory) {
@@ -252,7 +273,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 			mFileDescriptor = null;
 			mAccessory = null;
 		}
-		
+
 		// kill ourselves (stop this service) so that next time we
 		// get a new USB device we start the service from scratch
 		stopSelf();
@@ -315,7 +336,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 	};
 
 	/** Helper function for toasts
-	 * 
+	 *
 	 * @param toastStr string to toast
 	 */
 	private void Toast(CharSequence toastStr)
@@ -325,22 +346,22 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		Toast toast = Toast.makeText(this, toastStr, duration);
 		toast.show();
 	}
-	
+
 	/**
 	 * Sends commands to the USB port.
-	 * 
+	 *
 	 * @param command
 	 * @param target
 	 * @param value
 	 */
 	public void sendCommand(byte command, byte target, int value) {
-		
+
 		CharSequence text = "USB Command: " + command + " target: " + target + " value: " + value;
 		int duration = Toast.LENGTH_SHORT;
 
 		Toast toast = Toast.makeText(this, text, duration);
 		toast.show();
-		
+
 		byte[] buffer = new byte[3];
 		if (value > 255)
 			value = 255;
