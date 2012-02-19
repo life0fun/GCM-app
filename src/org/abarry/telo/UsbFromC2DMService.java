@@ -369,12 +369,26 @@ public class UsbFromC2DMService extends Service implements Runnable {
 		buffer[0] = command;
 		buffer[1] = target;
 		buffer[2] = (byte) value;
+
 		if (mOutputStream != null && buffer[1] != -1) {
+			text = "Sending Data Now";
+			toast = Toast.makeText(this, text, duration);
+			toast.show();
 			try {
 				mOutputStream.write(buffer);
 			} catch (IOException e) {
 				Log.e(TAG, "write failed", e);
+				text = "Write Failed";
+				toast = Toast.makeText(this, text, duration);
+				toast.show();
 			}
+		}
+		else {
+			if (mOutputStream == null) text = "mOutputStream = null, no data sent";
+			else if (buffer[1] == -1) text = "buffer[1] = -1, no data sent";
+			else text = "Bad mOutputStream but don't know what is wrong, no data sent";
+			toast = Toast.makeText(this, text, duration);
+			toast.show();
 		}
 	}
 
