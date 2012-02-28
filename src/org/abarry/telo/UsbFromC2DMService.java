@@ -87,6 +87,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 					UsbAccessory accessory = (UsbAccessory) intent.getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
 					if (intent.getBooleanExtra(
 							UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+						Toast("Trying to open accessory");
 						openAccessory(accessory);
 					} else {
 						Log.d(TAG, "permission denied for accessory "
@@ -101,6 +102,7 @@ public class UsbFromC2DMService extends Service implements Runnable {
 				if (accessory != null && accessory.equals(mAccessory)) {
 					closeAccessory();
 				}
+			else Toast("Something odd happened in USB Broadcast receiver");	
 			}
 		}
 	};
@@ -390,6 +392,9 @@ public class UsbFromC2DMService extends Service implements Runnable {
 			toast = Toast.makeText(this, text, duration);
 			toast.show();
 		}
+		text = "Data Sending Completed";
+		toast = Toast.makeText(this, text, duration);
+		toast.show();
 	}
 
 protected void handleSwitchMessage(SwitchMsg o) {
