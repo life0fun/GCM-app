@@ -1,0 +1,21 @@
+/Users/e51141/workspace/C2DM/gen/com/colorcloud/gcm/Manifest.java \
+/Users/e51141/workspace/C2DM/gen/com/colorcloud/gcm/R.java \
+ : /Users/e51141/workspace/C2DM/res/drawable-hdpi/ic_launcher.png \
+/Users/e51141/workspace/C2DM/res/drawable-hdpi/ic_stat_gcm.png \
+/Users/e51141/workspace/C2DM/res/drawable-ldpi/ic_launcher.png \
+/Users/e51141/workspace/C2DM/res/drawable-mdpi/ic_launcher.png \
+/Users/e51141/workspace/C2DM/res/drawable-nodpi/background_holo_dark.jpg \
+/Users/e51141/workspace/C2DM/res/drawable-nodpi/demokit_splash.png \
+/Users/e51141/workspace/C2DM/res/layout/activity_result.xml \
+/Users/e51141/workspace/C2DM/res/layout/gcm_row_inmsg.xml \
+/Users/e51141/workspace/C2DM/res/layout/gcm_row_mymsg.xml \
+/Users/e51141/workspace/C2DM/res/layout/main.xml \
+/Users/e51141/workspace/C2DM/res/layout/msg_frag.xml \
+/Users/e51141/workspace/C2DM/res/layout/no_device.xml \
+/Users/e51141/workspace/C2DM/res/layout/reg_frag.xml \
+/Users/e51141/workspace/C2DM/res/menu/options_menu.xml \
+/Users/e51141/workspace/C2DM/res/values/colors.xml \
+/Users/e51141/workspace/C2DM/res/values/strings.xml \
+/Users/e51141/workspace/C2DM/res/values/styles.xml \
+/Users/e51141/workspace/C2DM/res/xml/accessory_filter.xml \
+/Users/e51141/workspace/C2DM/AndroidManifest.xml \
